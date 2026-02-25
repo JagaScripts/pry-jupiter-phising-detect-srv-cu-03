@@ -1,0 +1,39 @@
+name: Reputation CI Guard (PR Checks)
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Linter and Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install ruff pytest
+
+      - name: Run Ruff Linter
+        run: |
+          # Solo checkeo, falla si hay errores
+          ruff check .
+          
+      - name: Run Pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          if [ -d tests ]; then pytest tests/; else echo "No tests found - skipping"; fi
