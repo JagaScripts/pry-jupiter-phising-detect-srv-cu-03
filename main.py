@@ -2,7 +2,7 @@ import requests
 import logging
 import os
 import json
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 import redis
 
