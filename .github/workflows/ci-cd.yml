@@ -7,46 +7,7 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
-    name: Run Tests and Linter
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Ruff Linter
-        run: |
-          ruff check .
-          
-      - name: Run Pytest
-        run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)
-          if [ -d tests ]; then pytest tests/; else echo "No tests found - skipping"; fi
-
-  # Docker Build step
-  build-push:
-    name: Build Docker Image
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
-    
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Build Docker Image (Dry Run)
-        run: |
-          docker build -t pry-jupiter-phising-detect-srv-reputation:${{ github.sha }} .
-          echo "Build successful. Image ready for GHCR push when configured."
+  ci:
+    uses: JagaScripts/proyecto-jupiter-phising-detect/.github/workflows/reusable-python-ci.yml@main
+    with:
+      service_name: srv-reputation
