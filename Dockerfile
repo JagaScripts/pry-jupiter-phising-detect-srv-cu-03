@@ -4,8 +4,8 @@ FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /app
 
-# Copiar dependencias
-COPY services/lib-shared-kernel /services/lib-shared-kernel
+# Copiar la librería compartida en la ruta relativa esperada (../lib-shared-kernel)
+COPY services/lib-shared-kernel /lib-shared-kernel
 COPY services/CU-03/pyproject.toml services/CU-03/uv.lock ./
 
 # Instalar dependencias
@@ -17,9 +17,9 @@ FROM python:3.12-slim-bookworm
 
 WORKDIR /app
 COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /lib-shared-kernel /lib-shared-kernel
 COPY services/CU-03/main.py /app/main.py
 COPY services/CU-03/tests /app/tests
-COPY services/lib-shared-kernel /services/lib-shared-kernel
 
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH="/app"
